@@ -4,19 +4,18 @@ const Posts = require('../db.js')
 
 const router = express.Router();
 
-
-// | GET    | /api/posts              | Returns an array of all the post objects contained in the database.    
+// | GET    | /api/posts       
 
 router.get('/', (req, res) =>
     Posts
         .find()
         .then(postList => res.status(200).json(postList))
-        .catch(err =>
+        .catch(() =>
             res.status(500).json({ error: "The posts information could not be retrieved." })
         )
 );
 
-// | GET    | /api/posts/:id          | Returns the post object with the specified id. 
+// | GET    | /api/posts/:id         
 
 router.get('/:id', (req, res) =>
     Posts
@@ -28,12 +27,12 @@ router.get('/:id', (req, res) =>
                     message: "The post with the specified ID does not exist."
                 })
         )
-        .catch(err =>
+        .catch(() =>
             res.status(500).json({ error: "The post information could not be retrieved." })
         )
 );
 
-// | GET    | /api/posts/:id/comments | Returns an array of all the comment objects associated with the post with the specified id. 
+// | GET    | /api/posts/:id/comments 
 
 router.get('/:id/comments', (req, res) =>
     Posts
@@ -43,17 +42,12 @@ router.get('/:id/comments', (req, res) =>
                 ? res.status(200).json(comments)
                 : res.status(404).json({ error: "The comments information could not be retrieved." })
         )
-        .catch(err =>
+        .catch(() =>
             res.status(500).json({ error: "The comments information could not be retrieved." })
         )
 );
 
-// | DELETE | /api/posts/:id          | Removes the post with the specified id and returns the **deleted post object**. You may need to make additional calls to the database in order to satisfy this requirement. |
-
-// let deletedPost = null;
-
-// Posts.findById(req.params.id).then(post => deletedPost = post)
-
+// | DELETE | /api/posts/:id      
 
 router.delete('/:id', (req, res) => {
     Posts
@@ -61,10 +55,10 @@ router.delete('/:id', (req, res) => {
         .then(post => {
             post
                 ? Posts.remove(post.id)
-                    .then(deleted =>
+                    .then(() =>
                         res.status(200).json(post)
                     )
-                    .catch(err =>
+                    .catch(() =>
                         res.status(500).json({ error: "The post could not be removed" })
                     )
                 : res.status(404).json({ message: "The post with the specified ID does not exist." })
@@ -82,14 +76,12 @@ router.post('/', (req, res) =>
                 Posts.findById(post.id)
                     .then(post => res.status(201).json(post))
             )
-            .catch(err =>
+            .catch(() =>
                 res.status(500).json({ error: "There was an error while saving the post to the database" })
             )
 );
 
-// | POST   | /api/posts/:id/comments | Creates a comment for the post with the specified id using information sent inside of the `request body`.   
-
-// - `insertComment()`: calling insertComment while passing it a `comment` object will add it to the database and return an object with the `id` of the inserted comment. The object looks like this: `{ id: 123 }`. This method will throw an error if the `post_id` field in the `comment` object does not match a valid post id in the database.
+// | POST   | /api/posts/:id/comments 
 
 router.post('/:id/comments', (req, res) =>
     req.body.text
@@ -105,11 +97,9 @@ router.post('/:id/comments', (req, res) =>
             .catch(() =>
                 res.status(500).json({ error: "There was an error while saving the comment to the database" }))
         : res.status(400).json({ errorMessage: "Please provide text for the comment." })
-)
+);
 
-// | PUT    | /api/posts/:id          | Updates the post with the specified `id` using data from the `request body`. Returns the modified document, **NOT the original**.  
-
-// - `update()`: accepts two arguments, the first is the `id` of the post to update and the second is an object with the `changes` to apply. It returns the count of updated records. If the count is 1 it means the record was updated correctly.
+// | PUT    | /api/posts/:id 
 
 router.put('/:id', (req, res) =>
     (req.body.title && req.body.contents)
@@ -126,7 +116,6 @@ router.put('/:id', (req, res) =>
             )
             .catch(() => res.status(500).json({ error: "The post information could not be modified." }))
         : res.status(400).json({ errorMessage: "Please provide title and contents for the post." })
-
-)
+);
 
 module.exports = router;
